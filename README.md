@@ -32,6 +32,12 @@ This generator fuses two complementary chaotic systems — the 3D **Lorenz attra
 
 ---
 
+## Updated 'nistrng' library
+
+This repository includes a patched version of the [`nistrng`](https://github.com/InsaneMonster/NistRng) Python library. Several bugs identified in the original package and test modules have been resolved. The original author's copyright is retained in full; all modifications are clearly documented alongside it.
+
+--
+
 ## Security Analysis
 
 Post-publication red-teaming was conducted using modern machine-learning distinguishers to evaluate resistance against predictive attacks.
