@@ -27,7 +27,7 @@ This generator fuses two complementary chaotic systems — the 3D **Lorenz attra
 |---|---|---|
 | NIST SP 800-22 (15 tests) | Passed | p-values well above threshold |
 | Shannon Entropy | Excellent | Near-ideal uniformity |
-| Linear Complexity / Autocorrelation | Strong | No detectable structure |
+| Linear Complexity / Serial correlation / Poker-Test | Strong | No detectable structure |
 | ML / Neural-network distinguishers | Highly resistant | See Security Analysis |
 
 ---
@@ -36,25 +36,106 @@ This generator fuses two complementary chaotic systems — the 3D **Lorenz attra
 
 This repository includes a patched version of the [`nistrng`](https://github.com/InsaneMonster/NistRng) Python library. Several bugs identified in the original package and test modules have been resolved. The original author's copyright is retained in full; all modifications are clearly documented alongside it.
 
---
+---
 
 ## Security Analysis
 
-Post-publication red-teaming was conducted using modern machine-learning distinguishers to evaluate resistance against predictive attacks.
+## Machine Learning-Based Red-Teaming Evaluation
 
-**Setup:** Over 3.5 million samples were evaluated with lagged prediction windows ranging from k = 50 to k = 200, using Linear Regression, MLP, ExtraTreesRegressor, and HistGradientBoostingRegressor.
+To evaluate resistance against predictive attacks, the generator was tested using a range of machine learning models with increasing expressive power on large-scale outputs.
 
-**Outcome:** No model outperformed the trivial "predict the mean" baseline. MSE values remained at the theoretical minimum for uniform [0, 1] data (~0.0834) and correlation coefficients stayed at noise level — indicating that the multi-map chaos, high-precision arithmetic, Argon2id seeding, and XOR mixing collectively destroy short- to medium-term structure beyond the reach of contemporary AI-based cryptanalysis.
+### Experimental Setup
 
-Full experimental setup, hyperparameters, and raw logs are available in `IMPLEMENTATION.md` and the `ml_attacks/` directory.
+* Data: up to **10 million bits** (~10⁷ samples)
+* Task: **next-bit prediction**
+* Input: sliding windows with **k = 50–200**
+* Evaluation: **80/20 train–test split**
+* Baseline: random guessing (**50% accuracy**, MSE ≈ theoretical minimum)
+
+---
+
+## Models Evaluated
+
+### 1. Linear Regression
+
+* Result: No improvement over baseline
+* Accuracy ≈ 50%, correlation ≈ 0
+
+**Interpretation:**
+No detectable linear relationship between past and future bits.
+
+---
+
+### 2. Logistic Regression
+
+* Train Accuracy: ~0.5005
+* Test Accuracy: ~0.5008
+
+**Interpretation:**
+No statistically meaningful predictive advantage. Consistency between train and test results indicates absence of generalizable structure.
+
+---
+
+### 3. Tree-Based Models (ExtraTrees, HistGradientBoosting)
+
+* Result: No improvement over baseline
+* MSE ≈ 0.0834 (theoretical value for uniform [0,1] data)
+
+**Interpretation:**
+No evidence of nonlinear partitioning or exploitable structure within the input space.
+
+---
+
+### 4. Feedforward Neural Network (MLP)
+
+* Architecture: single hidden layer (ReLU activation, 64 units)
+* Train Accuracy: ~0.5003–0.5004
+* Test Accuracy: ~0.4995–0.5001
+
+**Interpretation:**
+No learnable nonlinear structure within the tested window sizes. Predictions remain indistinguishable from random guessing.
+
+---
+
+## Statistical Analysis
+
+* Test set size: ~2 million samples
+* Expected standard deviation: ≈ 0.035%
+* Observed deviations: within ~0.05–0.08% (approximately 1–2 standard deviations)
+
+These deviations fall within expected statistical noise.
+
+---
+
+## Conclusion
+
+Across linear models, ensemble methods, and nonlinear neural networks, no model achieved predictive performance beyond random guessing on held-out data.
+
+These findings indicate:
+
+* No detectable short- to medium-range linear or nonlinear structure
+* Output behavior consistent with random sequences under the tested conditions
+
+---
+
+## Limitations
+
+This evaluation does not address:
+
+* Long-range dependencies
+* Sequence-based models (e.g., LSTM, Transformers)
+* Formal cryptographic security proofs
+
+Accordingly, these results provide empirical evidence of resistance to practical machine learning-based prediction, but do not constitute a proof of cryptographic security.
+
 
 ---
 
 ## Documentation
 
-For complete implementation details — mathematical formulation, RK4 integration, parameter mapping, bit extraction, test-suite commands, and the full ML attack methodology — see:
+For complete implementation details — see:
 
-→ [`IMPLEMENTATION.md`](./IMPLEMENTATION.md)
+→ [`r_Implementation.md`]
 
 ---
 
