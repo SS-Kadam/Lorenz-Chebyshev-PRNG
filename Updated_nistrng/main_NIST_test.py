@@ -22,7 +22,7 @@ from nistrng.sp800_22r1a.test_cumulative_sums import CumulativeSumsTest
 # ----------------------------------------------------------------------
 # CONFIG AREA
 # ----------------------------------------------------------------------
-FILE_PATH = r"C:\Users\Square Panda Admin\PycharmProjects\HelloWorld\app.py\file_name"
+FILE_PATH = "file_path"
 TEST_TO_RUN = "monobit"
 
 BLOCK_SIZE = 128
